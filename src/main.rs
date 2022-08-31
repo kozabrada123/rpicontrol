@@ -113,7 +113,7 @@ fn main() {
         }
 
         // If it's between 7 and 21 and we're in night mode, turn it off
-        else if now.hour() >= 7 && night {
+        if now.hour() >= 7 && now.hour() < 21 && night {
 
             info!("Disabling night mode..");
 
