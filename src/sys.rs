@@ -131,11 +131,11 @@ pub fn get_temp() -> f64 {
 
     // Get a substring of just the number
     let temp = temp_str.substring(
-        temp_str.rfind("=").unwrap(),
+        temp_str.rfind("=").unwrap() + 1,
         temp_str.rfind("'").unwrap()
     );
 
-    println!("Temp: {}", temp);
+    //println!("Temp: {}", temp);
 
     return temp.parse::<f64>().unwrap()
 }
