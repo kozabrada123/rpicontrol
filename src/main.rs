@@ -2,8 +2,8 @@ mod fan;
 mod sys;
 use rppal;
 use std;
-use log::{warn, error, debug, info};
-use std::fs::File;
+use log::{debug, info};
+use std::fs::{self, File};
 use daemonize::Daemonize;
 use chrono::prelude::*;
 use simple_logger::SimpleLogger;
@@ -15,9 +15,22 @@ fn main() {
 
     debug!("Starting Daemon..");
 
-    // Start ourselves as a daemon
-    let stdout = File::create("/tmp/rpictl.out").unwrap();
-    let stderr = File::create("/tmp/rpictl.err").unwrap();
+    // Start ourselves a daemon
+    // Create the daemon's directory
+    fs::create_dir("/tmp/rpictl/").unwrap();
+
+    let stdout = File::create("/tmp/rpictl/rpictl.out").unwrap();
+    let stderr = File::create("/tmp/rpictl/rpictl.err").unwrap();
+
+    // Files we save to
+    let nightmode = "/tmp/rpictl/nightmode";
+    let fanfile = "/tmp/rpictl/fan";
+    let temp = "/tmp/rpictl/temp";
+
+    // Create all needed files
+    File::create("/tmp/rpictl/nightmode").unwrap();
+    File::create("/tmp/rpictl/fan").unwrap();
+    File::create("/tmp/rpictl/temp").unwrap();
 
     let daemonize = Daemonize::new()
         .pid_file("/tmp/rpictl.pid") // Every method except `new` and `start`
@@ -62,7 +75,7 @@ fn main() {
     debug!("Getting pins...");
 
     // Define our pins & vars
-    let mut pin_fanctl = gpioctl.get(23).unwrap().into_output();
+    let pin_fanctl = gpioctl.get(23).unwrap().into_output();
     let mut night = false;
 
     debug!("Successfully intialized pins..");
@@ -110,7 +123,11 @@ fn main() {
 
             // Set night mode to off, so we know we've already set it
             night = false;
-        } 
-
+        }
+        
+        // Save down data to the right files
+        fs::write(nightmode, format!("{:?}", night)).unwrap(); // Nightmode
+        fs::write(fanfile, format!("{:?}", fan.enabled)).unwrap(); // Whether or not the fan is enabled
+        fs::write(temp, format!("{:?}", sys::get_temp())).unwrap(); // The temprature
     }
 }

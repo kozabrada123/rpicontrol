@@ -116,7 +116,7 @@ pub fn change_led_perms() {
 
 // -------- Get commands --------
 
-pub fn get_temp() {
+pub fn get_temp() -> f64 {
     // Get temp w/ vcgencmd
 
     let output = Command::new("sudo")
@@ -126,10 +126,16 @@ pub fn get_temp() {
     .output()
     .expect("Failed to execute command");
 
-    println!("{}", String::from_utf8_lossy(&output.stdout));
-    println!("");
-    println!("status: {}", output.status);
-    println!("err: {}", String::from_utf8_lossy(&output.stderr));
+    // Get the float celcius temperature from the output
+    let temp_str = String::from_utf8_lossy(&output.stdout).to_string();
+
+    // Get a substring of just the number
+    let temp = temp_str.substring(
+        temp_str.rfind("=").unwrap(),
+        temp_str.rfind("'").unwrap()
+    );
+
+    return temp.parse::<f64>().unwrap()
 }
 
 pub fn get_sysinfo() {
