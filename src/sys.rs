@@ -135,6 +135,8 @@ pub fn get_temp() -> f64 {
         temp_str.rfind("'").unwrap()
     );
 
+    println!("Temp: {}", temp);
+
     return temp.parse::<f64>().unwrap()
 }
 
