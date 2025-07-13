@@ -120,6 +120,8 @@ fn main() {
 
             let overall = usage / (cpu_num as f32);
 
+            log::info!("Overall: {}, cpus: {}, total: {}", overall, cpu_num, usage);
+
             if overall > 0.75 {
                 sys::set_led_on(GREEN_LED);
             } else {
