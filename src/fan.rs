@@ -1,13 +1,12 @@
 // With the current setup, 4- 5V, 6 and 16 GPIO 23 are used
-// GPIO 23 controls the fan; HIGH is on, LOW is 
+// GPIO 23 controls the fan; HIGH is on, LOW is off
 
-// rppal, rpi rust control lib
 use rppal;
 
 pub struct FanCtl {
     pub enabled: bool,
     pub controlpin: rppal::gpio::OutputPin,
-    _gpiocontroller: rppal::gpio::Gpio
+    _gpiocontroller: rppal::gpio::Gpio,
 }
 
 impl FanCtl {
@@ -15,7 +14,7 @@ impl FanCtl {
         FanCtl {
             enabled: false,
             controlpin: controlpin,
-            _gpiocontroller: gpiocontroller
+            _gpiocontroller: gpiocontroller,
         }
     }
 
@@ -29,21 +28,22 @@ impl FanCtl {
         self.controlpin.set_low();
     }
 
-    pub fn toggle(&mut self){
+    pub fn toggle(&mut self) {
         self.enabled = !self.enabled;
 
         match self.enabled {
             true => self.controlpin.set_high(),
-            false => self.controlpin.set_low()
+            false => self.controlpin.set_low(),
         }
     }
 
-    pub fn set(&mut self, enabled: bool){
+    pub fn set(&mut self, enabled: bool) {
         self.enabled = enabled;
 
         match self.enabled {
             true => self.controlpin.set_high(),
-            false => self.controlpin.set_low()
+            false => self.controlpin.set_low(),
         }
     }
 }
+
