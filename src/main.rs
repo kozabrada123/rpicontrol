@@ -115,15 +115,11 @@ fn main() {
         if !night_mode {
             system.refresh_cpu_all();
 
-            let cpu_num = system.cpus().len();
             let usage = system.global_cpu_usage();
 
-            let overall = usage / (cpu_num as f32);
-
-            log::info!("Overall: {}, cpus: {}, total: {}", overall, cpu_num, usage);
-
-            if overall > 0.75 {
+            if usage > 0.75 {
                 sys::set_led_on(GREEN_LED);
+					 log::info!("CPU usage @ {}%", usage);
             } else {
                 sys::set_led_off(GREEN_LED);
             }
