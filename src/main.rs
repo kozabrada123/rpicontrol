@@ -16,7 +16,7 @@ fn main() {
 
     debug!("Starting Daemon..");
 
-    fs::create_dir("/tmp/rpictl/").unwrap();
+    let _ = fs::create_dir("/tmp/rpictl/");
 
     let stdout = File::create("/tmp/rpictl/rpictl.out").unwrap();
     let stderr = File::create("/tmp/rpictl/rpictl.err").unwrap();
@@ -51,13 +51,13 @@ fn main() {
     // Signal that daemon is enabled
     sys::change_led_perms();
     for _i in 1..4 {
-        sys::led_off(GREEN_LED);
-        sys::led_off(RED_LED);
+        sys::set_led_off(GREEN_LED);
+        sys::set_led_off(RED_LED);
 
         std::thread::sleep(std::time::Duration::from_millis(200));
 
-        sys::led_on(GREEN_LED);
-        sys::led_on(RED_LED);
+        sys::set_led_on(GREEN_LED);
+        sys::set_led_on(RED_LED);
 
         std::thread::sleep(std::time::Duration::from_millis(200));
     }
@@ -93,8 +93,8 @@ fn main() {
         if now.hour() >= 21 && !night_mode {
             info!("Enabling night mode..");
 
-            sys::led_off(GREEN_LED);
-            sys::led_off(RED_LED);
+            sys::set_led_off(GREEN_LED);
+            sys::set_led_off(RED_LED);
 
             night_mode = true;
         }
@@ -102,8 +102,8 @@ fn main() {
         if now.hour() >= 7 && now.hour() < 21 && night_mode {
             info!("Disabling night mode..");
 
-            sys::led_on(GREEN_LED);
-            sys::led_on(RED_LED);
+            sys::set_led_on(GREEN_LED);
+            sys::set_led_on(RED_LED);
 
             night_mode = false;
         }
@@ -116,4 +116,3 @@ fn main() {
         std::thread::sleep(Duration::from_millis(100));
     }
 }
-

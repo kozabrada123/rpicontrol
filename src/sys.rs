@@ -1,76 +1,42 @@
 use std::{fs, path::Path, process::Command};
 use substring::Substring;
 
-pub const GREEN_LED: &str = "0";
-pub const RED_LED: &str = "1";
+pub const GREEN_LED: &str = "ACT";
+pub const RED_LED: &str = "PWR";
 
-//leds; see https://forums.raspberrypi.com/viewtopic.php?t=12530
-pub fn set_led_driver(iled: &str, driver: &str) {
+pub fn set_led_brightness(iled: &str, brightness: u8) {
     let led = match iled.to_lowercase().as_str() {
         "red" => RED_LED,
         "green" => GREEN_LED,
         _ => iled,
     };
 
-    let ledpath = format!("/sys/class/leds/led/{led}/trigger");
-
+    let ledpath = format!("/sys/class/leds/{led}/brightness");
     let path = Path::new(&ledpath);
 
-    fs::write(path, driver).unwrap();
+    fs::write(path, brightness.to_string()).unwrap();
 }
 
-pub fn led_on(iled: &str) {
-    let led = match iled.to_lowercase().as_str() {
-        "red" => RED_LED,
-        "green" => GREEN_LED,
-        _ => iled,
-    };
-
-    let driver = match led {
-        "0" => "mmc0",
-        "1" => "default-on",
-        _ => "mmc0",
-    };
-
-    set_led_driver(led, driver);
-
-    // Write 1 to the brightness file
-    let ledpath = format!("/sys/class/leds/led/{led}/brightness");
-    let path = Path::new(&ledpath);
-
-    fs::write(path, "1").unwrap();
+pub fn set_led_off(iled: &str) {
+	set_led_brightness(iled, 0);
 }
 
-pub fn led_off(iled: &str) {
-    set_led_driver(iled, "none");
+pub fn set_led_on(iled: &str) {
+	set_led_brightness(iled, 255);
 }
 
 pub fn change_led_perms() {
     Command::new("sudo")
         .arg("chmod")
-        .arg("777")
-        .arg(r#"/sys/class/leds/led0/trigger"#)
+        .arg("o+rw")
+        .arg(r#"/sys/class/leds/PWR/brightness"#)
         .output()
         .expect("Failed to execute command");
 
     Command::new("sudo")
         .arg("chmod")
-        .arg("777")
-        .arg(r#"/sys/class/leds/led1/trigger"#)
-        .output()
-        .expect("Failed to execute command");
-
-    Command::new("sudo")
-        .arg("chmod")
-        .arg("777")
-        .arg(r#"/sys/class/leds/led0/brightness"#)
-        .output()
-        .expect("Failed to execute command");
-
-    Command::new("sudo")
-        .arg("chmod")
-        .arg("777")
-        .arg(r#"/sys/class/leds/led1/brightness"#)
+        .arg("o+rw")
+        .arg(r#"/sys/class/leds/ACT/brightness"#)
         .output()
         .expect("Failed to execute command");
 }
@@ -222,4 +188,3 @@ pub fn get_disk_info() {
     println!("status: {}", output.status);
     println!("err: {}", String::from_utf8_lossy(&output.stderr));
 }
-
