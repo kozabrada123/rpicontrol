@@ -8,6 +8,7 @@ use simple_logger::SimpleLogger;
 use std;
 use std::fs::{self, File};
 use std::time::Duration;
+use sysinfo::{CpuRefreshKind, RefreshKind, System};
 
 use crate::sys::{GREEN_LED, RED_LED};
 
@@ -87,6 +88,9 @@ fn main() {
 
     debug!("Starting loop..");
 
+    let mut system =
+        System::new_with_specifics(RefreshKind::nothing().with_cpu(CpuRefreshKind::everything()));
+
     loop {
         let now: DateTime<Local> = Local::now();
 
@@ -106,6 +110,21 @@ fn main() {
             sys::set_led_on(RED_LED);
 
             night_mode = false;
+        }
+
+        if !night_mode {
+            system.refresh_cpu_all();
+
+            let cpu_num = system.cpus().len();
+            let usage = system.global_cpu_usage();
+
+            let overall = usage / (cpu_num as f32);
+
+            if overall > 0.75 {
+                sys::set_led_on(GREEN_LED);
+            } else {
+                sys::set_led_off(GREEN_LED);
+            }
         }
 
         fs::write(nightmode_path, night_mode.to_string()).unwrap();
