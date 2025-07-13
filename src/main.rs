@@ -117,7 +117,7 @@ fn main() {
 
             let usage = system.global_cpu_usage();
 
-            if usage > 0.75 {
+            if usage > 75.0 {
                 sys::set_led_on(GREEN_LED);
 					 log::info!("CPU usage @ {}%", usage);
             } else {
